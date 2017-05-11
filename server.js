@@ -12,8 +12,8 @@ var elasticSearch = new elasticsearch({
 });
 
 var config = {
-  projectId: 'Enter your project ID',
-  keyFilename: 'Enter the path of your key file'
+  projectId: 'finalproj-167105',
+  keyFilename: 'finalProj-3d8fb5b0c6f8.json'
 };
 
 var datastore = require('@google-cloud/datastore')(config);
@@ -27,7 +27,7 @@ var Type = 'restaurants';
 var Type2 = 'events';
 
 
-app.get('/restaurants/zip/:id', function(req, res) { //To respond with information of related to some retaurants in a particular neighborhood
+app.get('/restaurants/zip/:id', function(req, res) {
     elasticSearch.search({
     index: index,
     type: Type,
@@ -38,6 +38,7 @@ app.get('/restaurants/zip/:id', function(req, res) { //To respond with informati
         sort: {
             rating: "desc"
         },
+        //size: 1
     }
 }, function(err, data) {
 	console.log(data.hits.hits);
@@ -45,7 +46,7 @@ app.get('/restaurants/zip/:id', function(req, res) { //To respond with informati
  });
 });
 
-app.get('/social/zip/:id', function(req, res) {	  //To respond with information of related to some music venues, jazz club, opera and social clubs in a particular neighborhood
+app.get('/social/zip/:id', function(req, res) {
     elasticSearch.search({
     index: index,
     type: Type2,
@@ -56,6 +57,7 @@ app.get('/social/zip/:id', function(req, res) {	  //To respond with information 
         sort: {
             rating: "desc"
         },
+        //size: 1
     }
 }, function(err, data) {
 
@@ -71,5 +73,5 @@ app.get('/complaints/zip/:id', function(req, res) {
     });
 });
 
-app.listen(8080);
-console.log('Listening on port 8080...');
+app.listen(3000);
+console.log('Listening on port 3000...');
