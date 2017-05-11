@@ -1,16 +1,19 @@
 {
-  "name": "proj",
+  "name": "kyn",
+  "description": "kyn",
   "version": "1.0.0",
-  "description": "",
-  "main": "server.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC",
+  "private": true,
   "dependencies": {
-    "q": "^1.5.0",
-    "yelp": "^1.0.2",
-    "yelp-fusion": "^1.0.3"
+    "@google-cloud/bigtable": "^0.9.1",
+    "@google-cloud/datastore": "^1.0.1",
+    "@google-cloud/storage": "^1.1.0",
+    "aws-es": "^1.5.3",
+    "express": "3.x",
+    "google-cloud": "^0.53.0",
+    "google-cloud-kvstore": "^4.0.0",
+    "newyorktimes": "0.0.2",
+    "node-gcm": "^0.14.6",
+    "nyt": "^0.1.0",
+    "readline": "^1.3.0"
   }
 }
