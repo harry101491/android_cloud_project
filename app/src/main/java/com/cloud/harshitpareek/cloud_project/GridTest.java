@@ -60,7 +60,7 @@ public class GridTest extends AppCompatActivity implements NavigationView.OnNavi
                 }
                 else if(t.getName() == R.string.home)
                 {
-                    // handling of the click at home
+                    displayNotification() // handling of the click at home
                 }
             }
         });
@@ -112,6 +112,23 @@ public class GridTest extends AppCompatActivity implements NavigationView.OnNavi
         return super.onOptionsItemSelected(item);
     }
 
+     public void displayNotification(){
+        //Toast.makeText(getApplicationContext(), "himanshu", Toast.LENGTH_SHORT).show();
+        NotificationCompat.Builder builder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setContentTitle("Notifications Example")
+                        .setContentText("This is a test notification");
+
+        /*Intent notificationIntent = new Intent(this, push_notifications.class);
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.setContentIntent(contentIntent);
+        // Add as notification*/
+        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        manager.notify(0, builder.build());
+    }
+    
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
