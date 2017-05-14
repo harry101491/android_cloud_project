@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+ <head>
+
+	<script src="http://code.jquery.com/jquery-latest.min.js"></script>
+ 
+	<style>
+	H5 { 
+		text-align: center 
+	   }
+	   
+	 H3 { 
+		text-align: center 
+	   }
+	
+	.line {
+		fill: none;
+		stroke: steelblue;
+		stroke-width: 2px;
+		}
+		
+	.bar{
+		fill: steelblue;
+		}
+
+	.bar:hover{
+		fill: brown;
+		}
+
+	.axis {
+		font: 10px sans-serif;
+		}
+
+	.axis path,
+	.axis line {
+		fill: none;
+		stroke: #000;
+		shape-rendering: crispEdges;
+		}
+
+	</style>
+ </head>
+
+ <body>
+ <h3>Statistics of Your Neighbourhood Complaints<h3>
+ <h5><a href="graph1.html">View Combined City Data</a><h5>
+ <div id='total'><h2>Total Complaints vs Year</h2></div>
+ <div id='noise'><h2>Count of Noise Complaints vs Year</h2></div>
+ <div id='rodent'><h2>Count of Rodent Complaints vs Year</h2></div>
+ <div id='others'><h2>Count of other Complaints vs Year</h2></div>
+	<script src="https://d3js.org/d3.v3.min.js"></script>
+ <script>
+// set the dimensions of the canvas
+var margin = {top: 20, right: 0, bottom: 70, left: 40},
+    width = 600 - margin.left - margin.right,
+    height = 300 - margin.top - margin.bottom;
+
+
+// set the ranges
+var x = d3.scale.ordinal().rangeRoundBands([0, width], .05);
+
+var y = d3.scale.linear().range([height, 0]);
+
+// define the axis
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom")
+
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left")
+    .ticks(10);
+
+
+// add the SVG element
+var total_svg = d3.select("#total").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", 
+          "translate(" + margin.left + "," + margin.top + ")");
+
+
+// load the data
+d3.json("total_bar_data.json", function(error, data) {
+
+    data.forEach(function(d) {
+        d.year = d.year;
+        d.total = +d.total;
+    });
+	
+  // scale the range of the data
+  x.domain(data.map(function(d) { return d.year; }));
+  y.domain([0, d3.max(data, function(d) { return d.total; })]);
+
+  // add axis
+  total_svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis)
+    .selectAll("text")
+      .style("text-anchor", "end")
+      .attr("dx", "-.8em")
+      .attr("dy", "-.55em")
+      .attr("transform", "rotate(-90)" );
+
+  total_svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 5)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Total");
+
+
+  // Add bar chart
+  total_svg.selectAll("bar")
+      .data(data)
+    .enter().append("rect")
+      .attr("class", "bar")
+      .attr("x", function(d) { return x(d.year); })
+      .attr("width", x.rangeBand())
+      .attr("y", function(d) { return y(d.total); })
+      .attr("height", function(d) { return height - y(d.total); });
+
+});
+
+
+// Adding second svg
+
+
+// add the SVG element
+var rodent_svg = d3.select("#rodent").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", 
+          "translate(" + margin.left + "," + margin.top + ")");
+
+
+// load the data
+d3.json("total_bar_data.json", function(error, data) {
+
+    data.forEach(function(d) {
+        d.year = d.year;
+        d.rodent = +d.rodent;
+    });
+	
+  // scale the range of the data
+  x.domain(data.map(function(d) { return d.year; }));
+  y.domain([0, d3.max(data, function(d) { return d.rodent; })]);
+
+  // add axis
+  rodent_svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis)
+      .selectAll("text")
+      .style("text-anchor", "end")
+      .attr("dx", "-.8em")
+      .attr("dy", "-.55em")
+      .attr("transform", "rotate(-90)" );
+
+  rodent_svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 5)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Rodent");
+
+
+  // Add bar chart
+  rodent_svg.selectAll("bar")
+      .data(data)
+    .enter().append("rect")
+      .attr("class", "bar")
+      .attr("x", function(d) { return x(d.year); })
+      .attr("width", x.rangeBand())
+      .attr("y", function(d) { return y(d.rodent); })
+      .attr("height", function(d) { return height - y(d.rodent); });
+
+});
+
+
+// Adding third svg
+
+
+// add the SVG element
+var noise_svg = d3.select("#noise").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", 
+          "translate(" + margin.left + "," + margin.top + ")");
+
+
+// load the data
+d3.json("total_bar_data.json", function(error, data) {
+
+    data.forEach(function(d) {
+        d.year = d.year;
+        d.noise = +d.noise;
+    });
+	
+  // scale the range of the data
+  x.domain(data.map(function(d) { return d.year; }));
+  y.domain([0, d3.max(data, function(d) { return d.noise; })]);
+
+  // add axis
+  noise_svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis)
+    .selectAll("text")
+      .style("text-anchor", "end")
+      .attr("dx", "-.8em")
+      .attr("dy", "-.55em")
+      .attr("transform", "rotate(-90)" );
+
+  noise_svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 5)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Noise");
+
+
+  // Add bar chart
+  noise_svg.selectAll("bar")
+      .data(data)
+    .enter().append("rect")
+      .attr("class", "bar")
+      .attr("x", function(d) { return x(d.year); })
+      .attr("width", x.rangeBand())
+      .attr("y", function(d) { return y(d.noise); })
+      .attr("height", function(d) { return height - y(d.noise); });
+
+});
+
+//Other SVG
+
+var other_svg = d3.select("#others").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", 
+          "translate(" + margin.left + "," + margin.top + ")");
+
+
+// load the data
+d3.json("total_bar_data.json", function(error, data) {
+
+    data.forEach(function(d) {
+        d.year = d.year;
+        d.other = +d.other;
+    });
+	
+  // scale the range of the data
+  x.domain(data.map(function(d) { return d.year; }));
+  y.domain([0, d3.max(data, function(d) { return d.other; })]);
+
+  // add axis
+  other_svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis)
+      .selectAll("text")
+      .style("text-anchor", "end")
+      .attr("dx", "-.8em")
+      .attr("dy", "-.55em")
+      .attr("transform", "rotate(-90)" );
+
+  other_svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 5)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Other");
+
+
+  // Add bar chart
+  other_svg.selectAll("bar")
+      .data(data)
+    .enter().append("rect")
+      .attr("class", "bar")
+      .attr("x", function(d) { return x(d.year); })
+      .attr("width", x.rangeBand())
+      .attr("y", function(d) { return y(d.other); })
+      .attr("height", function(d) { return height - y(d.other); });
+
+});
+</script>
+</body>
+</html>
