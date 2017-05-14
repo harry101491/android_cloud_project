@@ -1,9 +1,10 @@
-//This server end file contains all the GET rest call definitions that are made from the android app for fetching data.
+var path = require("path");
 var express = require('express');
 var elasticsearch = require('aws-es');
 var app = express();
 var config = require('./config.js');
 var cities = require('cities');
+
 
 var elasticSearch = new elasticsearch({
     accessKeyId: config.accessKeyId,
@@ -12,10 +13,18 @@ var elasticSearch = new elasticsearch({
     region: config.region,
     host: config.host
 });
+var body_parser = require('body-parser');
+
+app.use(body_parser.urlencoded({
+    extended: true
+}));
+
+app.use(body_parser.json());
+app.set('view engine','ejs');
 
 var config = {
-  projectId: 'enter the project id as mentioned for your google cloud datastore',
-  keyFilename: 'enter the path for the key file'
+  projectId: 'Enter the project id of your google platform',
+  keyFilename: 'Enter the path of your key file'
 };
 
 var datastore = require('@google-cloud/datastore')(config);
@@ -29,7 +38,21 @@ var index = 'nyc311data';
 var Type = 'data_new';
 var Type2 = 'events';
 
+var path = require('path');
+app.use(express.static(path.join(__dirname, 'public')));
 
+//To render the html containing the designs
+app.get('/count_file:match_text?', function(req, res) {
+	var text = req.param('match_text');
+	text1=text.split(',');
+	lat = text1[0];
+	lon = text1[1]; 
+	console.log(lat+','+lon);
+	res.render('total_bar');
+	
+});
+
+//For fetching neighborhood locations for the google map
 app.get('/gmap/zip/:lat/:lon', function(req, res) {
     elasticSearch.search({
     index: index,
@@ -55,7 +78,7 @@ app.get('/gmap/zip/:lat/:lon', function(req, res) {
 
         //size: 1
 }, function(err, data) {
-	if(err){console.log('There is an error');}
+	if(err){console.log(err);}
 	else{
 		console.log(data.hits.hits);
 		res.send(data.hits.hits);
@@ -63,6 +86,7 @@ app.get('/gmap/zip/:lat/:lon', function(req, res) {
  });
 });
 
+//To fetch nearby restaurant data
 app.get('/restaurants/zip/:lat/:lon', function(req, res) {
     elasticSearch.search({
     index: 'yelpf',
@@ -77,7 +101,7 @@ app.get('/restaurants/zip/:lat/:lon', function(req, res) {
         //size: 1
     }
 }, function(err, data) {
-	if(err){console.log('There is an error');}
+	if(err){console.log(err);}
 	else{
 		console.log(data.hits.hits);
 		res.send(data.hits.hits);
@@ -85,6 +109,7 @@ app.get('/restaurants/zip/:lat/:lon', function(req, res) {
  });
 });
 
+//To fetch data related to music clubs, music venues, opera, jazz and blue
 app.get('/social/zip/:lat/:lon', function(req, res) {
     elasticSearch.search({
     index: 'yelpf',
@@ -101,7 +126,7 @@ app.get('/social/zip/:lat/:lon', function(req, res) {
 }, function(err, data) {
 	if(err)
 	{
-		console.log('There is an error');
+		console.log(err);
 	}
 	else
 	{
@@ -111,6 +136,7 @@ app.get('/social/zip/:lat/:lon', function(req, res) {
  });
 });
 
+//to return the total count of different complaints in the neighborhood
 app.get('/count/zip/:lat/:lon', function(req, res) {
     elasticSearch.search({
     index: 'neighborstats',
@@ -143,10 +169,10 @@ app.get('/count/zip/:lat/:lon', function(req, res) {
  });
 });
 
-
+//To return the complaints in the surrounding neighborhood
 app.get('/complaints/zip/:lat/:lon', function(req, res) {
     store.get(cities.gps_lookup(req.params.lat, req.params.lon).zipcode, function(err, data) {
-	if(err){console.log('There is an error');}
+	if(err){console.log(err);}
 	else{	
 		console.log(data);
 		res.send(data);
@@ -154,9 +180,10 @@ app.get('/complaints/zip/:lat/:lon', function(req, res) {
     });
 });
 
+// To return the rating
 app.get('/rating/zip/:lat/:lon', function(req, res) {
 	store.get(cities.gps_lookup(req.params.lat, req.params.lon).zipcode, function(err, data) {
-	if(err){console.log('There is an error');}
+	if(err){console.log(err);}
 	else{
 	var val = data;
 	var rate = val[val.length-1];
