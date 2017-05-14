@@ -25,8 +25,10 @@ var store = kvstore(datastore);
 
 var index = 'nyc311data';
 
+
 var Type = 'data_new';
 var Type2 = 'events';
+
 
 app.get('/gmap/zip/:lat/:lon', function(req, res) {
     elasticSearch.search({
@@ -63,8 +65,8 @@ app.get('/gmap/zip/:lat/:lon', function(req, res) {
 
 app.get('/restaurants/zip/:lat/:lon', function(req, res) {
     elasticSearch.search({
-    index: index,
-    type: Type,
+    index: 'yelpf',
+    type: 'restaurants',
     body: {
         query: {
             match: {zip : cities.gps_lookup(req.params.lat, req.params.lon).zipcode}
@@ -85,7 +87,7 @@ app.get('/restaurants/zip/:lat/:lon', function(req, res) {
 
 app.get('/social/zip/:lat/:lon', function(req, res) {
     elasticSearch.search({
-    index: index,
+    index: 'yelpf',
     type: Type2,
     body: {
         query: {
@@ -108,6 +110,39 @@ app.get('/social/zip/:lat/:lon', function(req, res) {
 	}
  });
 });
+
+app.get('/count/zip/:lat/:lon', function(req, res) {
+    elasticSearch.search({
+    index: 'neighborstats',
+    type: 'datastatscoor',
+    body: {
+        query: {
+            match: {lat : req.params.lat},match: {lon : req.params.lon}
+        }
+        //size: 1
+    }
+}, function(err, data) {
+	if(err)
+	{
+		console.log(err);
+		
+	}
+	else
+	{
+		//console.log(data.hits.hits);
+		var arr=data.hits.hits;
+		var store=[];
+		for (var i=0; i<arr.length;i++)
+		{
+			var temp={"year":arr[i]._source.year, "total":arr[i]._source.total, "noise":arr[i]._source.noise,"rodent":arr[i]._source.rodent,"other":arr[i]._source.other};
+			store.push(temp);
+		}
+		res.send(store);
+		
+	}
+ });
+});
+
 
 app.get('/complaints/zip/:lat/:lon', function(req, res) {
     store.get(cities.gps_lookup(req.params.lat, req.params.lon).zipcode, function(err, data) {
