@@ -1,7 +1,9 @@
+//This server end file contains all the GET rest call definitions that are made from the android app for fetching data.
 var express = require('express');
 var elasticsearch = require('aws-es');
 var app = express();
 var config = require('./config.js');
+var cities = require('cities');
 
 var elasticSearch = new elasticsearch({
     accessKeyId: config.accessKeyId,
@@ -12,8 +14,8 @@ var elasticSearch = new elasticsearch({
 });
 
 var config = {
-  projectId: 'Enter your project ID',
-  keyFilename: 'Enter the path of your key file'
+  projectId: 'enter the project id as mentioned for your google cloud datastore',
+  keyFilename: 'enter the path for the key file'
 };
 
 var datastore = require('@google-cloud/datastore')(config);
@@ -21,19 +23,51 @@ var storage = require('@google-cloud/storage')(config);
 var kvstore = require('google-cloud-kvstore');
 var store = kvstore(datastore);
 
-var index = 'yelpf';
+var index = 'nyc311data';
 
-var Type = 'restaurants';
+var Type = 'data_new';
 var Type2 = 'events';
 
-
-app.get('/restaurants/zip/:id', function(req, res) {
+app.get('/gmap/zip/:lat/:lon', function(req, res) {
     elasticSearch.search({
     index: index,
     type: Type,
     body: {
         query: {
-            match: {zip : req.params.id}
+             "bool" : {
+            "must" : {
+                "match_all" : {}
+            },
+            "filter" : {
+                "geo_distance" : {
+                    "distance" : "3.21869km",
+                    "loc" : {
+                        "lat" : req.params.lat,
+                        "lon" : req.params.lon
+                    }
+                }
+            }
+        }
+    }
+        }
+
+        //size: 1
+}, function(err, data) {
+	if(err){console.log('There is an error');}
+	else{
+		console.log(data.hits.hits);
+		res.send(data.hits.hits);
+	}
+ });
+});
+
+app.get('/restaurants/zip/:lat/:lon', function(req, res) {
+    elasticSearch.search({
+    index: index,
+    type: Type,
+    body: {
+        query: {
+            match: {zip : cities.gps_lookup(req.params.lat, req.params.lon).zipcode}
         },
         sort: {
             rating: "desc"
@@ -41,18 +75,21 @@ app.get('/restaurants/zip/:id', function(req, res) {
         //size: 1
     }
 }, function(err, data) {
-	console.log(data.hits.hits);
-	res.send(data.hits.hits);
+	if(err){console.log('There is an error');}
+	else{
+		console.log(data.hits.hits);
+		res.send(data.hits.hits);
+	}
  });
 });
 
-app.get('/social/zip/:id', function(req, res) {
+app.get('/social/zip/:lat/:lon', function(req, res) {
     elasticSearch.search({
     index: index,
     type: Type2,
     body: {
         query: {
-            match: {zip : req.params.id}
+            match: {zip : cities.gps_lookup(req.params.lat, req.params.lon).zipcode}
         },
         sort: {
             rating: "desc"
@@ -60,21 +97,32 @@ app.get('/social/zip/:id', function(req, res) {
         //size: 1
     }
 }, function(err, data) {
-
-	console.log(data.hits.hits);
-	res.send(data.hits.hits);
+	if(err)
+	{
+		console.log('There is an error');
+	}
+	else
+	{
+		console.log(data.hits.hits);
+		res.send(data.hits.hits);
+	}
  });
 });
 
-app.get('/complaints/zip/:id', function(req, res) {
-    store.get(req.params.id, function(err, data) {
-	console.log(data);
-	res.send(data);
+app.get('/complaints/zip/:lat/:lon', function(req, res) {
+    store.get(cities.gps_lookup(req.params.lat, req.params.lon).zipcode, function(err, data) {
+	if(err){console.log('There is an error');}
+	else{	
+		console.log(data);
+		res.send(data);
+	}
     });
 });
 
-app.get('/rating/zip/:id', function(req, res) {
-	store.get(req.params.id, function(err, data) {
+app.get('/rating/zip/:lat/:lon', function(req, res) {
+	store.get(cities.gps_lookup(req.params.lat, req.params.lon).zipcode, function(err, data) {
+	if(err){console.log('There is an error');}
+	else{
 	var val = data;
 	var rate = val[val.length-1];
 	//console.log(rate);
@@ -94,7 +142,9 @@ app.get('/rating/zip/:id', function(req, res) {
 		var PeaceLevel= "Low";
 		res.send({"PeaceLevel":PeaceLevel, "text":text });
 	}
+	}
     });
+  
 });
 
 
