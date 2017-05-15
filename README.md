@@ -29,4 +29,4 @@ Google authentication has been implemented for Sign In purposes.
 A Bound service has been implemented in the android app for a client server architecture
 which allows smooth exchange of data through the network without blocking the main UI Thread.
 A grid like view has been created for users to have a user friendly experience with the app.
-The Application was finally deployed in Google App Engine.
+The Application was finally deployed in an EC2 server.
