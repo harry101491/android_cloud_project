@@ -2,6 +2,7 @@
 #android_cloud_project
 
 Project Overview
+
 Relocating within this New York City can be really hectic and stressful, especially when you are obscure about a particular neighborhood.
 Knowledge of the community, local crimes, sanitation, noise levels during different times of a day is not readily available and requires 
 quite a research. To avoid any surprises and sour experiences, we have decided to come up with an application that provides such 
